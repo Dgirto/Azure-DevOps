@@ -1,0 +1,60 @@
+{
+  "id": "azure_devops",
+  "name": "Azure DevOps",
+  "name_en": "Azure DevOps",
+  "version": "1.0.0",
+  "description": "Gestión de trabajo en Azure DevOps: crear work items, consultar el estado de pipelines y agregar comentarios",
+  "description_en": "Work management in Azure DevOps: create work items, check pipeline status and add comments",
+  "icon": "icon.svg",
+  "category": "devops",
+  "category_en": "devops",
+  "keywords": ["azure", "devops", "azure devops", "pipelines", "work items", "ci/cd", "microsoft", "cloud", "nube"],
+  "library": {
+    "package": "ruvic-azure-devops-connector",
+    "install": "pip install git+https://github.com/Dgirto/Azure-DevOps.git#subdirectory=lib",
+    "import_name": "ruvic_azure_devops_connector"
+  },
+  "auth_modes": [
+    {
+      "id": "personal_access_token",
+      "label": "Personal Access Token (PAT)",
+      "fields": [
+        {
+          "key": "organization",
+          "label": "Organización",
+          "type": "text",
+          "required": true,
+          "placeholder": "mi-organizacion"
+        },
+        {
+          "key": "project",
+          "label": "Proyecto",
+          "type": "text",
+          "required": true,
+          "placeholder": "mi-proyecto"
+        },
+        {
+          "key": "personal_access_token",
+          "label": "Personal Access Token",
+          "type": "password",
+          "secret": true,
+          "required": true
+        },
+        {
+          "key": "connect_timeout",
+          "label": "Timeout de conexión (segundos)",
+          "type": "number",
+          "required": false,
+          "default": "10"
+        }
+      ]
+    }
+  ],
+  "env_prefix": "RUVIC_AZURE_DEVOPS_",
+  "operations": ["azure_devops.create_work_item", "azure_devops.get_pipeline_status", "azure_devops.add_comment"],
+  "test_connection": true,
+  "docs": {
+    "skill": "SKILL.md",
+    "permissions_note": "El Personal Access Token necesita, como mínimo, los scopes 'Work Items (Read & Write)' y 'Build (Read)'. No se requieren scopes de administración del proyecto ni de la organización. Este conector SÍ escribe datos reales (crea work items y comentarios)."
+  }
+}

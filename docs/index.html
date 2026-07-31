@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title data-i18n="doc_title">Conector Azure DevOps — Ruvic</title>
+  <link rel="stylesheet" href="assets/ruvic.css">
+</head>
+<body>
+  <main class="ruvic-container">
+    <nav class="ruvic-toc" aria-label="Índice">
+      <h2 data-i18n="toc_title">Contenido</h2>
+      <ol>
+        <li><a href="#que-es" data-i18n="toc.que_es">¿Qué es y para qué sirve?</a></li>
+        <li><a href="#prerrequisitos" data-i18n="toc.prerrequisitos">Prerrequisitos</a></li>
+        <li><a href="#configuracion-fabricante" data-i18n="toc.configuracion_fabricante">Configuración en el fabricante</a></li>
+        <li><a href="#permisos" data-i18n="toc.permisos">Permisos requeridos</a></li>
+        <li><a href="#configuracion-ruvic" data-i18n="toc.configuracion_ruvic">Configuración en Ruvic</a></li>
+        <li><a href="#verificacion" data-i18n="toc.verificacion">Verificación</a></li>
+        <li><a href="#solucion-problemas" data-i18n="toc.solucion_problemas">Solución de problemas</a></li>
+        <li><a href="#faq-seguridad" data-i18n="toc.faq_seguridad">Preguntas frecuentes y notas de seguridad</a></li>
+      </ol>
+    </nav>
+
+    <h1 data-i18n="guide_title">Conector Azure DevOps</h1>
+    <p class="guide-updated">{{ULTIMA_ACTUALIZACION}}</p>
+
+    <section>
+      <h2 id="que-es" data-i18n="section.que_es">¿Qué es y para qué sirve?</h2>
+      <p data-i18n="section.que_es.body">Este conector permite al agente de Ruvic gestionar trabajo en Azure DevOps: crear work items, consultar el estado de la ejecución más reciente de un pipeline, y agregar comentarios a un work item existente.</p>
+      <div class="callout callout-warning">
+        <span class="callout-title" data-i18n="section.que_es.sensitive_title">Este conector escribe datos reales</span>
+        <span data-i18n="section.que_es.sensitive_body">create_work_item y add_comment crean registros reales en el proyecto configurado. No hay modo dry-run.</span>
+      </div>
+      <table>
+        <thead><tr><th data-i18n="table.operacion">Operación</th><th data-i18n="table.que_hace">Qué hace</th></tr></thead>
+        <tbody>
+          <tr><td><code>azure_devops.create_work_item</code></td><td data-i18n="op.create_work_item">Crea un work item (Task, Bug, User Story, etc.)</td></tr>
+          <tr><td><code>azure_devops.get_pipeline_status</code></td><td data-i18n="op.get_pipeline_status">Consulta el estado de la última ejecución de un pipeline</td></tr>
+          <tr><td><code>azure_devops.add_comment</code></td><td data-i18n="op.add_comment">Agrega un comentario a un work item existente</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2 id="prerrequisitos" data-i18n="section.prerrequisitos">Prerrequisitos</h2>
+      <ul>
+        <li data-i18n="prereq.1">Una <strong>organización y proyecto de Azure DevOps</strong> ya creados.</li>
+        <li data-i18n="prereq.2">Permiso para generar un <strong>Personal Access Token</strong> en esa organización.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2 id="configuracion-fabricante" data-i18n="section.configuracion_fabricante">Configuración en el fabricante</h2>
+      <ol class="ruvic-steps">
+        <li>
+          <strong data-i18n="step.1.label">Generá un Personal Access Token dedicado.</strong>
+          <p data-i18n="step.1.body">En Azure DevOps → User Settings → Personal Access Tokens → New Token.</p>
+        </li>
+        <li>
+          <strong data-i18n="step.2.label">Asigná los scopes mínimos necesarios.</strong>
+          <p data-i18n="step.2.body">Marcá "Work Items" en modo Read & Write, y "Build" en modo Read. No marques scopes de administración de proyecto u organización.</p>
+        </li>
+        <li>
+          <strong data-i18n="step.3.label">Anotá los identificadores necesarios.</strong>
+          <p data-i18n="step.3.body">Nombre de la organización, nombre del proyecto, y el Personal Access Token generado (solo se muestra una vez).</p>
+        </li>
+      </ol>
+    </section>
+
+    <section>
+      <h2 id="permisos" data-i18n="section.permisos">Permisos requeridos</h2>
+      <table>
+        <thead><tr><th data-i18n="table.permiso">Permiso</th><th data-i18n="table.para_que">Para qué sirve</th></tr></thead>
+        <tbody>
+          <tr><td>Work Items (Read &amp; Write)</td><td data-i18n="perm.work_items">Crear work items y agregar comentarios</td></tr>
+          <tr><td>Build (Read)</td><td data-i18n="perm.build">Consultar el estado de pipelines</td></tr>
+        </tbody>
+      </table>
+      <div class="callout callout-info">
+        <span class="callout-title" data-i18n="perm.note_title">Nota</span>
+        <span data-i18n="perm.note_body">No se otorgan scopes de administración de proyecto ("Project and Team") ni de organización ("Graph", "Identity").</span>
+      </div>
+    </section>
+
+    <section>
+      <h2 id="configuracion-ruvic" data-i18n="section.configuracion_ruvic">Configuración en Ruvic</h2>
+      <p data-i18n="ruvic.intro">Entrá a <strong>Settings → Conectores</strong>, buscá <strong>Azure DevOps</strong> y pulsá <strong>Configurar</strong>. Completá Organización, Proyecto y Personal Access Token.</p>
+      <p><span class="ruvic-button" data-i18n="ruvic.test_button">Probar conexión</span><span data-i18n="ruvic.test_note"> — la plataforma consultará los metadatos del proyecto para confirmar credenciales.</span></p>
+    </section>
+
+    <section>
+      <h2 id="verificacion" data-i18n="section.verificacion">Verificación</h2>
+      <ol class="ruvic-steps">
+        <li><strong data-i18n="verif.1.label">Test de conexión exitoso.</strong><p data-i18n="verif.1.body">"Probar conexión" debe responder con éxito.</p></li>
+        <li><strong data-i18n="verif.2.label">Prueba mínima con el agente.</strong><p data-i18n="verif.2.body">Pedile:</p><blockquote data-i18n="verif.2.quote">"Creame un Task de prueba llamado 'Validación Ruvic'."</blockquote><p data-i18n="verif.2.result">El agente debe confirmar la creación y devolver el ID del work item.</p></li>
+      </ol>
+    </section>
+
+    <section>
+      <h2 id="solucion-problemas" data-i18n="section.solucion_problemas">Solución de problemas</h2>
+      <table>
+        <thead><tr><th data-i18n="table.mensaje">Mensaje / síntoma</th><th data-i18n="table.causa">Causa probable y solución</th></tr></thead>
+        <tbody>
+          <tr><td data-i18n="trouble.1.msg">"Credenciales inválidas o PAT sin permiso suficiente"</td><td data-i18n="trouble.1.fix">PAT vencido/rotado, o falta el scope "Work Items" o "Build" necesario.</td></tr>
+          <tr><td data-i18n="trouble.2.msg">"Recurso no encontrado"</td><td data-i18n="trouble.2.fix">Nombre de organización o proyecto mal escrito, o el work item/pipeline indicado no existe en ese proyecto.</td></tr>
+          <tr><td data-i18n="trouble.3.msg">"No se pudo conectar a Azure DevOps" (timeout)</td><td data-i18n="trouble.3.fix">Nombre de organización incorrecto, o restricciones de red que bloquean a Ruvic.</td></tr>
+          <tr><td data-i18n="trouble.4.msg">"El pipeline no tiene ejecuciones registradas"</td><td data-i18n="trouble.4.fix">El pipeline nunca se ejecutó, o el ID de pipeline es incorrecto.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2 id="faq-seguridad" data-i18n="section.faq_seguridad">Preguntas frecuentes y notas de seguridad</h2>
+      <h3 data-i18n="faq.1.q">¿El agente puede administrar el proyecto o la organización?</h3>
+      <div data-i18n="faq.1.a"><p>No. El PAT solo tiene permisos sobre work items (lectura/escritura) y pipelines (lectura); el conector no expone ninguna operación de administración.</p></div>
+      <h3 data-i18n="faq.2.q">¿Dónde queda guardado el Personal Access Token?</h3>
+      <div data-i18n="faq.2.a"><p>Como secreto en el almacén de credenciales de la plataforma. La interfaz nunca vuelve a mostrarlo.</p></div>
+      <h3 data-i18n="faq.3.q">Rotación de credenciales</h3>
+      <div data-i18n="faq.3.a"><p>Los PAT de Azure DevOps expiran según la fecha configurada al crearlos (máximo 1 año). Generá uno nuevo antes del vencimiento y actualizalo en el formulario.</p></div>
+      <h3 data-i18n="faq.4.q">¿Qué hago si el Personal Access Token se compromete?</h3>
+      <div data-i18n="faq.4.a"><ol><li>Revocá el PAT comprometido en Azure DevOps → User Settings → Personal Access Tokens.</li><li>Generá uno nuevo y actualizalo en el formulario.</li><li>Revisá el historial de auditoría del proyecto por actividad inesperada.</li></ol></div>
+      <div class="callout callout-warning">
+        <span class="callout-title" data-i18n="faq.warning_title">Buenas prácticas</span>
+        <span data-i18n="faq.warning_body">Usá un PAT dedicado con scopes mínimos y expiración corta; nunca uses un PAT con permisos de administración global; y confirmá con el usuario antes de crear work items o comentarios contra un proyecto de producción.</span>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const I18N = {
+      es: {
+        doc_title: "Conector Azure DevOps — Ruvic", toc_title: "Contenido",
+        "toc.que_es": "¿Qué es y para qué sirve?", "toc.prerrequisitos": "Prerrequisitos",
+        "toc.configuracion_fabricante": "Configuración en el fabricante", "toc.permisos": "Permisos requeridos",
+        "toc.configuracion_ruvic": "Configuración en Ruvic", "toc.verificacion": "Verificación",
+        "toc.solucion_problemas": "Solución de problemas", "toc.faq_seguridad": "Preguntas frecuentes y notas de seguridad",
+        guide_title: "Conector Azure DevOps",
+        "section.que_es": "¿Qué es y para qué sirve?",
+        "section.que_es.body": "Este conector permite al agente de Ruvic gestionar trabajo en Azure DevOps: crear work items, consultar el estado de la ejecución más reciente de un pipeline, y agregar comentarios a un work item existente.",
+        "section.que_es.sensitive_title": "Este conector escribe datos reales",
+        "section.que_es.sensitive_body": "create_work_item y add_comment crean registros reales en el proyecto configurado. No hay modo dry-run.",
+        "table.operacion": "Operación", "table.que_hace": "Qué hace",
+        "op.create_work_item": "Crea un work item (Task, Bug, User Story, etc.)",
+        "op.get_pipeline_status": "Consulta el estado de la última ejecución de un pipeline",
+        "op.add_comment": "Agrega un comentario a un work item existente",
+        "section.prerrequisitos": "Prerrequisitos",
+        "prereq.1": "Una <strong>organización y proyecto de Azure DevOps</strong> ya creados.",
+        "prereq.2": "Permiso para generar un <strong>Personal Access Token</strong> en esa organización.",
+        "section.configuracion_fabricante": "Configuración en el fabricante",
+        "step.1.label": "Generá un Personal Access Token dedicado.",
+        "step.1.body": "En Azure DevOps → User Settings → Personal Access Tokens → New Token.",
+        "step.2.label": "Asigná los scopes mínimos necesarios.",
+        "step.2.body": "Marcá \"Work Items\" en modo Read & Write, y \"Build\" en modo Read. No marques scopes de administración de proyecto u organización.",
+        "step.3.label": "Anotá los identificadores necesarios.",
+        "step.3.body": "Nombre de la organización, nombre del proyecto, y el Personal Access Token generado (solo se muestra una vez).",
+        "section.permisos": "Permisos requeridos", "table.permiso": "Permiso", "table.para_que": "Para qué sirve",
+        "perm.work_items": "Crear work items y agregar comentarios", "perm.build": "Consultar el estado de pipelines",
+        "perm.note_title": "Nota",
+        "perm.note_body": "No se otorgan scopes de administración de proyecto (\"Project and Team\") ni de organización (\"Graph\", \"Identity\").",
+        "section.configuracion_ruvic": "Configuración en Ruvic",
+        "ruvic.intro": "Entrá a <strong>Settings → Conectores</strong>, buscá <strong>Azure DevOps</strong> y pulsá <strong>Configurar</strong>. Completá Organización, Proyecto y Personal Access Token.",
+        "ruvic.test_button": "Probar conexión",
+        "ruvic.test_note": " — la plataforma consultará los metadatos del proyecto para confirmar credenciales.",
+        "section.verificacion": "Verificación",
+        "verif.1.label": "Test de conexión exitoso.", "verif.1.body": "\"Probar conexión\" debe responder con éxito.",
+        "verif.2.label": "Prueba mínima con el agente.", "verif.2.body": "Pedile:",
+        "verif.2.quote": "\"Creame un Task de prueba llamado 'Validación Ruvic'.\"",
+        "verif.2.result": "El agente debe confirmar la creación y devolver el ID del work item.",
+        "section.solucion_problemas": "Solución de problemas", "table.mensaje": "Mensaje / síntoma", "table.causa": "Causa probable y solución",
+        "trouble.1.msg": "\"Credenciales inválidas o PAT sin permiso suficiente\"",
+        "trouble.1.fix": "PAT vencido/rotado, o falta el scope \"Work Items\" o \"Build\" necesario.",
+        "trouble.2.msg": "\"Recurso no encontrado\"",
+        "trouble.2.fix": "Nombre de organización o proyecto mal escrito, o el work item/pipeline indicado no existe en ese proyecto.",
+        "trouble.3.msg": "\"No se pudo conectar a Azure DevOps\" (timeout)",
+        "trouble.3.fix": "Nombre de organización incorrecto, o restricciones de red que bloquean a Ruvic.",
+        "trouble.4.msg": "\"El pipeline no tiene ejecuciones registradas\"",
+        "trouble.4.fix": "El pipeline nunca se ejecutó, o el ID de pipeline es incorrecto.",
+        "section.faq_seguridad": "Preguntas frecuentes y notas de seguridad",
+        "faq.1.q": "¿El agente puede administrar el proyecto o la organización?",
+        "faq.1.a": "No. El PAT solo tiene permisos sobre work items (lectura/escritura) y pipelines (lectura); el conector no expone ninguna operación de administración.",
+        "faq.2.q": "¿Dónde queda guardado el Personal Access Token?",
+        "faq.2.a": "Como secreto en el almacén de credenciales de la plataforma. La interfaz nunca vuelve a mostrarlo.",
+        "faq.3.q": "Rotación de credenciales",
+        "faq.3.a": "Los PAT de Azure DevOps expiran según la fecha configurada al crearlos (máximo 1 año). Generá uno nuevo antes del vencimiento y actualizalo en el formulario.",
+        "faq.4.q": "¿Qué hago si el Personal Access Token se compromete?",
+        "faq.4.a": "Revocá el PAT comprometido en Azure DevOps. Generá uno nuevo y actualizalo en el formulario. Revisá el historial de auditoría del proyecto por actividad inesperada.",
+        "faq.warning_title": "Buenas prácticas",
+        "faq.warning_body": "Usá un PAT dedicado con scopes mínimos y expiración corta; nunca uses un PAT con permisos de administración global; y confirmá con el usuario antes de crear work items o comentarios contra un proyecto de producción.",
+      },
+      en: {
+        doc_title: "Azure DevOps Connector — Ruvic", toc_title: "Contents",
+        "toc.que_es": "What it is and what it's for", "toc.prerrequisitos": "Prerequisites",
+        "toc.configuracion_fabricante": "Vendor-side setup", "toc.permisos": "Required permissions",
+        "toc.configuracion_ruvic": "Setup in Ruvic", "toc.verificacion": "Verification",
+        "toc.solucion_problemas": "Troubleshooting", "toc.faq_seguridad": "FAQ and security notes",
+        guide_title: "Azure DevOps Connector",
+        "section.que_es": "What it is and what it's for",
+        "section.que_es.body": "This connector lets the Ruvic agent manage work in Azure DevOps: create work items, check the status of a pipeline's most recent run, and add comments to an existing work item.",
+        "section.que_es.sensitive_title": "This connector writes real data",
+        "section.que_es.sensitive_body": "create_work_item and add_comment create real records in the configured project. There is no dry-run mode.",
+        "table.operacion": "Operation", "table.que_hace": "What it does",
+        "op.create_work_item": "Creates a work item (Task, Bug, User Story, etc.)",
+        "op.get_pipeline_status": "Checks the status of a pipeline's latest run",
+        "op.add_comment": "Adds a comment to an existing work item",
+        "section.prerrequisitos": "Prerequisites",
+        "prereq.1": "An existing <strong>Azure DevOps organization and project</strong>.",
+        "prereq.2": "Permission to generate a <strong>Personal Access Token</strong> in that organization.",
+        "section.configuracion_fabricante": "Vendor-side setup",
+        "step.1.label": "Generate a dedicated Personal Access Token.",
+        "step.1.body": "Azure DevOps → User Settings → Personal Access Tokens → New Token.",
+        "step.2.label": "Assign the minimum required scopes.",
+        "step.2.body": "Check \"Work Items\" in Read & Write mode, and \"Build\" in Read mode. Do not check project or organization administration scopes.",
+        "step.3.label": "Note down the required identifiers.",
+        "step.3.body": "Organization name, project name, and the generated Personal Access Token (only shown once).",
+        "section.permisos": "Required permissions", "table.permiso": "Permission", "table.para_que": "Why the connector needs it",
+        "perm.work_items": "Create work items and add comments", "perm.build": "Check pipeline status",
+        "perm.note_title": "Note",
+        "perm.note_body": "No project (\"Project and Team\") or organization (\"Graph\", \"Identity\") administration scopes are granted.",
+        "section.configuracion_ruvic": "Setup in Ruvic",
+        "ruvic.intro": "Go to <strong>Settings → Connectors</strong>, find <strong>Azure DevOps</strong> and click <strong>Configure</strong>. Fill in Organization, Project and Personal Access Token.",
+        "ruvic.test_button": "Test connection",
+        "ruvic.test_note": " — the platform will query the project's metadata to confirm credentials.",
+        "section.verificacion": "Verification",
+        "verif.1.label": "Successful connection test.", "verif.1.body": "\"Test connection\" should succeed.",
+        "verif.2.label": "Minimal test with the agent.", "verif.2.body": "Ask:",
+        "verif.2.quote": "\"Create a test Task called 'Ruvic Validation'.\"",
+        "verif.2.result": "The agent should confirm creation and return the work item's ID.",
+        "section.solucion_problemas": "Troubleshooting", "table.mensaje": "Message / symptom", "table.causa": "Likely cause and fix",
+        "trouble.1.msg": "\"Invalid credentials or PAT with insufficient permission\"",
+        "trouble.1.fix": "Expired/rotated PAT, or missing the required \"Work Items\" or \"Build\" scope.",
+        "trouble.2.msg": "\"Resource not found\"",
+        "trouble.2.fix": "Organization or project name mistyped, or the referenced work item/pipeline doesn't exist in that project.",
+        "trouble.3.msg": "\"Could not connect to Azure DevOps\" (timeout)",
+        "trouble.3.fix": "Wrong organization name, or network restrictions blocking Ruvic.",
+        "trouble.4.msg": "\"The pipeline has no runs recorded\"",
+        "trouble.4.fix": "The pipeline never ran, or the pipeline ID is wrong.",
+        "section.faq_seguridad": "FAQ and security notes",
+        "faq.1.q": "Can the agent administer the project or organization?",
+        "faq.1.a": "No. The PAT only has permissions over work items (read/write) and pipelines (read); the connector exposes no administration operation.",
+        "faq.2.q": "Where is the Personal Access Token stored?",
+        "faq.2.a": "As a secret in the platform's credential store. The UI never shows it again.",
+        "faq.3.q": "Credential rotation",
+        "faq.3.a": "Azure DevOps PATs expire on the date configured when created (up to 1 year). Generate a new one before expiry and update it in the form.",
+        "faq.4.q": "What if the Personal Access Token is compromised?",
+        "faq.4.a": "Revoke the compromised PAT in Azure DevOps. Generate a new one and update it in the form. Review the project's audit log for unexpected activity.",
+        "faq.warning_title": "Best practices",
+        "faq.warning_body": "Use a dedicated PAT with minimal scopes and a short expiration; never use a PAT with global admin permissions; and confirm with the user before creating work items or comments against a production project.",
+      },
+    };
+    (function () {
+      function applyLang(lang) {
+        document.querySelectorAll("[data-i18n]").forEach(function (el) {
+          const key = el.getAttribute("data-i18n");
+          if (I18N[lang] && I18N[lang][key] !== undefined) el.innerHTML = I18N[lang][key];
+        });
+      }
+      let saved = "es";
+      try { const stored = localStorage.getItem("ruvic-docs-lang"); if (stored === "en" || stored === "es") saved = stored; } catch (e) {}
+      applyLang(saved);
+    })();
+  </script>
+</body>
+</html>
