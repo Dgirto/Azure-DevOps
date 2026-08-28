@@ -34,6 +34,12 @@ from .logging_utils import get_logger
 API_VERSION = "7.1"
 
 
+def _require_str(value: Any, field: str) -> str:
+    if not isinstance(value, str):
+        raise AzureDevOpsDataError(f"{field} debe ser un string, no {type(value).__name__}.")
+    return value
+
+
 class AzureDevOpsClient:
     """Cliente de Azure DevOps sobre la organización y proyecto configurados.
 
@@ -120,6 +126,10 @@ class AzureDevOpsClient:
         Ejemplo:
             >>> client.create_work_item("Task", "Revisar deploy", "Ver logs de prod")
         """
+        work_item_type = _require_str(work_item_type, "work_item_type").strip()
+        if not work_item_type:
+            raise AzureDevOpsDataError("work_item_type no puede estar vacío.")
+        title = _require_str(title, "title")
         if not title:
             raise AzureDevOpsDataError("title no puede estar vacío.")
         url = (
@@ -197,6 +207,7 @@ class AzureDevOpsClient:
         Ejemplo:
             >>> client.add_comment(123, "Verificado en staging")
         """
+        text = _require_str(text, "text")
         if not text:
             raise AzureDevOpsDataError("text no puede estar vacío.")
         url = (
