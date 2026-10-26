@@ -25,10 +25,23 @@ organización.
 
 ### `create_work_item(work_item_type: str, title: str, description: str = "") -> dict`
 
-Crea un work item real en el proyecto configurado.
+Crea un work item real en el proyecto configurado. Valida el tipo antes
+de crear: si no existe en el proceso del proyecto, lanza
+`AzureDevOpsDataError` con los tipos disponibles y no crea nada.
+Devuelve `id`, `type`, `title`, `state` y `url`.
 
 ```python
 work_item = client.create_work_item("Task", "Revisar deploy", "Ver logs de prod")
+print(work_item["id"], work_item["url"])
+```
+
+### `list_work_item_types() -> list[str]`
+
+Lista los tipos habilitados en el proyecto (Basic: Epic, Issue, Task;
+Agile: User Story, Bug, Task, etc.).
+
+```python
+tipos = client.list_work_item_types()
 ```
 
 ### `get_pipeline_status(pipeline_id: int) -> dict`
@@ -71,3 +84,8 @@ Nunca dejes propagar excepciones crudas de `requests`
   lectura).
 - Si el usuario no especifica un tipo de work item, preguntá o usá
   "Task" como default razonable — no asumas "Bug" sin que lo pida.
+- **Si el tipo pedido no existe en el proyecto, NO lo sustituyas por
+  otro "equivalente"** (ej. User Story → Issue). Informa el error con
+  los tipos disponibles y pregunta al usuario cuál quiere usar.
+- Muestra al usuario solo los campos relevantes (número, tipo, título,
+  estado, enlace); no vuelques respuestas JSON completas de la API.

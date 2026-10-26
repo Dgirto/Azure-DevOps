@@ -51,7 +51,7 @@
     }
   ],
   "env_prefix": "RUVIC_AZURE_DEVOPS_",
-  "operations": ["azure_devops.create_work_item", "azure_devops.get_pipeline_status", "azure_devops.add_comment"],
+  "operations": ["azure_devops.create_work_item", "azure_devops.get_pipeline_status", "azure_devops.add_comment", "azure_devops.list_work_item_types"],
   "test_connection": true,
   "docs": {
     "skill": "SKILL.md",

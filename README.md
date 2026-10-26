@@ -67,3 +67,13 @@ prueba.
 - La autenticación usa HTTP Basic Auth con el PAT como contraseña y
   usuario vacío — es el esquema estándar de la API REST de Azure
   DevOps, no requiere `azure-identity`.
+- `create_work_item` valida el tipo contra `list_work_item_types()` antes
+  de crear y responde con los tipos disponibles si no existe; nunca lo
+  sustituye por otro.
+- `add_comment` comprueba primero que el work item exista: Azure DevOps
+  responde 500 (TF237135, "sin permisos en el área") al comentar un ID
+  inexistente, lo que confundía el diagnóstico.
+- `get_pipeline_status` distingue "el pipeline no existe" de "existe pero
+  no tiene ejecuciones".
+- `create_work_item` y `add_comment` devuelven solo los campos útiles
+  (no la respuesta completa de la API).
